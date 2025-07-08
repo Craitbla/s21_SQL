@@ -101,4 +101,7 @@ Please add a way to see additional rows with the most expensive cost to the SQL 
 | ... | ... |
 | 95 | {a,d,c,b,a} |
 
+## Авторы проекта:
+  * Aglet Craitbla ([GitHub](https://github.com/Craitbla))
+  * LyailyaRai ([GitHub](https://github.com/LyailyaRai))
 
