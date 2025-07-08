@@ -1,8 +1,8 @@
-# Day 01 — SQL Bootcamp
+# Day 02 — SQL Bootcamp
 
-## _First steps working with sets and JOINs in SQL_
+## _Deep diving into JOINs in SQL_
 
-Resume: Today you will see how to get needed data based on sets constructions and simple JOINs.
+Resume: Today you will see how to get needed data based on different structures JOINs.
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
@@ -15,49 +15,64 @@ Resume: Today you will see how to get needed data based on sets constructions an
 3. [Chapter III](#chapter-iii) \
     3.1. [Rules of the day](#rules-of-the-day)  
 4. [Chapter IV](#chapter-iv) \
-    4.1. [Exercise 00 — Let’s make UNION dance](#exercise-00-lets-make-union-dance)  
+    4.1. [Exercise 00 — Move to the LEFT, move to the RIGHT](#exercise-00-move-to-the-left-move-to-the-right)  
 5. [Chapter V](#chapter-v) \
-    5.1. [Exercise 01 — UNION dance with subquery](#exercise-01-union-dance-with-subquery)  
+    5.1. [Exercise 01 — Find data gaps](#exercise-01-find-data-gaps)  
 6. [Chapter VI](#chapter-vi) \
-    6.1. [Exercise 02 — Duplicates or not duplicates](#exercise-02-duplicates-or-not-duplicates)  
+    6.1. [Exercise 02 — FULL means ‘completely filled’](#exercise-02-full-means-completely-filled)  
 7. [Chapter VII](#chapter-vii) \
-    7.1. [Exercise 03 — “Hidden” Insights](#exercise-03-hidden-insights)  
+    7.1. [Exercise 03 — Reformat to CTE](#exercise-03-reformat-to-cte)  
 8. [Chapter VIII](#chapter-viii) \
-    8.1. [Exercise 04 — Difference? Yep, let's find the difference between multisets](#exercise-04-difference-yep-lets-find-the-difference-between-multisets)
+    8.1. [Exercise 04 — Find favourite pizzas](#exercise-04-find-favourite-pizzas)
 9. [Chapter IX](#chapter-ix) \
-    9.1. [Exercise 05 — Did you hear about Cartesian Product?](#exercise-05-did-you-hear-about-cartesian-product)
+    9.1. [Exercise 05 — Investigate Person Data](#exercise-05-investigate-person-data)
 10. [Chapter X](#chapter-x) \
-    10.1. [Exercise 06 — Lets see on “Hidden” Insights](#exercise-06-lets-see-on-hidden-insights)
+    10.1. [Exercise 06 — favourite pizzas for Denis and Anna](#exercise-06-favourite-pizzas-for-denis-and-anna)
 11. [Chapter XI](#chapter-xi) \
-    11.1. [Exercise 07 — Just make a JOIN](#exercise-07-just-make-a-join)
+    11.1. [Exercise 07 — Cheapest pizzeria for Dmitriy](#exercise-07-cheapest-pizzeria-for-dmitriy)
 12. [Chapter XII](#chapter-xii) \
-    12.1. [Exercise 08 — Migrate JOIN to NATURAL JOIN](#exercise-08-migrate-join-to-natural-join)
+    12.1. [Exercise 08 — Continuing to research data](#exercise-08-continuing-to-research-data)
 13. [Chapter XIII](#chapter-xiii) \
-    13.1. [Exercise 09 — IN versus EXISTS](#exercise-09-in-versus-exists)
+    13.1. [Exercise 09 — Who loves cheese and pepperoni?](#exercise-09-who-loves-cheese-and-pepperoni)
 14. [Chapter XIV](#chapter-xiv) \
-    14.1. [Exercise 10 — Global JOIN](#exercise-10-global-join)
+    14.1. [Exercise 10 — Find persons from one city](#exercise-10-find-persons-from-one-city)
 
 
 ## Chapter I
 ## Preamble
 
-![D01_01](misc/images/D01_01.png)
+![D02_01](misc/images/D02_01.png)
 
-In many aspects, sets are used in Relational Databases. Not only to do UNION or MINUS between sets. Sets are also good candidates for doing recursive queries.
+The image shows a Relational Expression in Tree View. This expression corresponds to the following SQL query:
 
-There are the following set operators in PostgreSQL:
-- UNION [ALL]
-- EXCEPT [ALL] 
-- INTERSECT [ALL]
+    SELECT *
+        FROM R CROSS JOIN S
+    WHERE clause
 
-The keyword "ALL" means to store duplicate rows in the result.
-The main rules for working with sets are as follows:
-- Main SQL provides final names of attributes for the whole query.
-- The attributes of controlled SQL should match the number of columns and corresponding family types of main SQL.
+In other words, we can describe any SQL in the mathematical language of Relational Algebra.
 
-![D01_02](misc/images/D01_02.png)
+The main question (that we hear from our students) is why do we need to learn Relational Algebra in a course if we can write a SQL in the first attempt? My answer is yes and no at the same time. "Yes" means that you can write a SQL from the first attempt, that's right, "No" means that you need to know the main aspects of Relational Algebra, because this knowledge is used for optimization plans and for semantic queries. 
+What kind of joins exist in Relational Algebra?
+Actually, "Cross Join" is a primitive operator and it is an ancestor for other types of joins.
+- Natural Join,
+- Theta Join,
+- Semi Join,
+- Anti Join,
+- Left/Right/Full Joins. 
 
-In addition, SQL sets are useful for calculating some specific data science metrics, such as the Jaccard distance between 2 objects based on existing data features.
+But what is a join operation between 2 tables? Let me present a part of pseudo code how join operation works without indexing.
+
+    FOR r in R LOOP
+        FOR s in S LOOP
+        if r.id = s.r_id then add(r,s)
+        …
+        END;
+    END;
+
+It’s just a set of loops ... Not magic at all
+
+
+
 
 ## Chapter II
 ## General Rules
@@ -77,9 +92,9 @@ Absolutely anything can be represented in SQL! Let's get started and have fun!
 ## Chapter III
 ## Rules of the day
 
-- Please make sure you have your own database and access to it on your PostgreSQL cluster. 
+- Please make sure you have an own database and access for it on your PostgreSQL cluster. 
 - Please download a [script](materials/model.sql) with Database Model here and apply the script to your database (you can use command line with psql or just run it through any IDE, for example DataGrip from JetBrains or pgAdmin from PostgreSQL community). 
-- All tasks contain a list of Allowed and Denied sections with listed database options, database types, SQL constructions etc. Please have a look at the section before you start.
+- All tasks contain a list of Allowed and Denied sections with listed database options, database types, SQL constructions etc. Please have a look at that section before you start.
 - Please take a look at the Logical View of our Database Model. 
 
 ![schema](misc/images/schema.png)
@@ -114,207 +129,218 @@ Absolutely anything can be represented in SQL! Let's get started and have fun!
 People's visit and people's order are different entities and don't contain any correlation between data. For example, a customer can be in a restaurant (just looking at the menu) and in that time place an order in another restaurant by phone or mobile application. Or another case, just be at home and again make a call with order without any visits.
 
 ## Chapter IV
-## Exercise 00 — Let’s make UNION dance
+## Exercise 00 — Move to the LEFT, move to the RIGHT
 
-| Exercise 00: Let’s make UNION dance |                                                                                                                          |
+| Exercise 00: Move to the LEFT, move to the RIGHT |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex00                                                                                                                     |
-| Files to turn-in                      | `day01_ex00.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex00.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Please write a SQL statement that returns the menu identifier and pizza names from the `menu` table and the person identifier and person name from the `person` table in one global list (with column names as shown in the example below) ordered by object_id and then by object_name columns.
-
-| object_id | object_name |
-| ------ | ------ |
-| 1 | Anna |
-| 1 | cheese pizza |
-| ... | ... |
-
+Write a SQL statement that returns a list of pizzerias with the corresponding rating value that have not been visited by people.
 
 
 ## Chapter V
-## Exercise 01 — UNION dance with subquery
+## Exercise 01 — Find data gaps
 
-| Exercise 01: UNION dance with subquery|                                                                                                                          |
+| Exercise 01: Find data gaps|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex01                                                                                                                     |
-| Files to turn-in                      | `day01_ex01.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex01.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| SQL Syntax Construction                        | `generate_series(...)`                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Please modify an SQL statement from "Exercise 00" by removing the object_id column. Then change the order by object_name for part of the data from the `person` table and then from the `menu` table (as shown in an example below). Please save duplicates!
+Please write a SQL statement that returns the missing days from January 1 through January 10, 2022 (including all days) for visits by people with identifiers 1 or 2 (i.e., days missed by both). Please order by visit days in ascending mode. The sample data with column names is shown below.
 
-| object_name |
+| missing_date |
 | ------ |
-| Andrey |
-| Anna |
-| ... |
-| cheese pizza |
-| cheese pizza |
+| 2022-01-03 |
+| 2022-01-04 |
+| 2022-01-05 |
 | ... |
 
 
 ## Chapter VI
-## Exercise 02 — Duplicates or not duplicates
+## Exercise 02 — FULL means ‘completely filled’
 
-| Exercise 02: Duplicates or not duplicates|                                                                                                                          |
+| Exercise 02: FULL means ‘completely filled’|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex02                                                                                                                     |
-| Files to turn-in                      | `day01_ex02.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex02.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 | **Denied**                               |                                                                                                                          |
-| SQL Syntax Construction                        | `DISTINCT`, `GROUP BY`, `HAVING`, any type of `JOINs`                                                                                              |
- 
-Write an SQL statement that returns unique pizza names from the `menu` table and sorts them by the pizza_name column in descending order. Please note the Denied section.
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
+
+Please write an SQL statement that will return the entire list of names of people who visited (or did not visit) pizzerias during the period from January 1 to January 3, 2022 on one side and the entire list of names of pizzerias that were visited (or did not visit) on the other side. The data sample with the required column names is shown below. Please note the replacement value '-' for `NULL` values in the columns `person_name` and `pizzeria_name`. Please also add the order for all 3 columns.
+
+| person_name | visit_date | pizzeria_name |
+| ------ | ------ | ------ |
+| - | null | DinoPizza |
+| - | null | DoDo Pizza |
+| Andrey | 2022-01-01 | Dominos |
+| Andrey | 2022-01-02 | Pizza Hut |
+| Anna | 2022-01-01 | Pizza Hut |
+| Denis | null | - |
+| Dmitriy | null | - |
+| ... | ... | ... |
 
 ## Chapter VII
-## Exercise 03 — “Hidden” Insights
+## Exercise 03 — Reformat to CTE
 
-| Exercise 03: “Hidden” Insights |                                                                                                                          |
+| Exercise 03: Reformat to CTE |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex03                                                                                                                     |
-| Files to turn-in                      | `day01_ex03.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex03.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
+| SQL Syntax Construction                        | `generate_series(...)`                                                                                              |
 | **Denied**                               |                                                                                                                          |
-| SQL Syntax Construction                        |  any type of `JOINs`                                                                                              |
+| SQL Syntax Construction                        | `NOT IN`, `IN`, `NOT EXISTS`, `EXISTS`, `UNION`, `EXCEPT`, `INTERSECT`                                                                                              |
 
-Write an SQL statement that returns common rows for attributes order_date, person_id from the `person_order` table on one side and visit_date, person_id from the `person_visits` table on the other side (see an example below). In other words, let's find the identifiers of persons who visited and ordered a pizza on the same day. Actually, please add the order by action_date in ascending mode and then by person_id in descending mode.
+Let's go back to Exercise #01, please rewrite your SQL using the CTE (Common Table Expression) pattern. Please go to the CTE part of your "day generator". The result should look similar to Exercise #01.
 
-| action_date | person_id |
-| ------ | ------ |
-| 2022-01-01 | 6 |
-| 2022-01-01 | 2 |
-| 2022-01-01 | 1 |
-| 2022-01-03 | 7 |
-| 2022-01-04 | 3 |
-| ... | ... |
+| missing_date | 
+| ------ | 
+| 2022-01-03 | 
+| 2022-01-04 | 
+| 2022-01-05 | 
+| ... |
 
 ## Chapter VIII
-## Exercise 04 — Difference? Yep, let's find the difference between multisets.
+## Exercise 04 — Find favourite pizzas
 
 
-| Exercise 04: Difference? Yep, let's find the difference between multisets. |                                                                                                                          |
+| Exercise 04: Find favourite pizzas |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex04                                                                                                                     |
-| Files to turn-in                      | `day01_ex04.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex04.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
-| **Denied**                               |                                                                                                                          |
-| SQL Syntax Construction                        |  any type of `JOINs`                                                                                              |
 
-Please write a SQL statement that returns a difference (minus) of person_id column values while saving duplicates between `person_order` table and `person_visits` table for order_date and visit_date are for January 7, 2022.
+Find complete information about all possible pizzeria names and prices to get mushroom or pepperoni pizza. Then sort the result by pizza name and pizzeria name. The result of the sample data is shown below (please use the same column names in your SQL statement).
+
+| pizza_name | pizzeria_name | price |
+| ------ | ------ | ------ |
+| mushroom pizza | Dominos | 1100 |
+| mushroom pizza | Papa Johns | 950 |
+| pepperoni pizza | Best Pizza | 800 |
+| ... | ... | ... |
 
 ## Chapter IX
-## Exercise 05 — Did you hear about Cartesian Product?
+## Exercise 05 — Investigate Person Data
 
 
-| Exercise 05: Did you hear about Cartesian Product? |                                                                                                                          |
+| Exercise 05: Investigate Person Data |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex05                                                                                                                     |
-| Files to turn-in                      | `day01_ex05.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex05.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Please write a SQL statement that returns all possible combinations between `person` and `pizzeria` tables, and please set the order of the person identifier columns and then the pizzeria identifier columns. Please take a look at the sample result below. Please note that the column names may be different for you.
+Find the names of all females over the age of 25 and sort the result by name. The sample output is shown below.
 
-| person.id | person.name | age | gender | address | pizzeria.id | pizzeria.name | rating |
-| ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| 1 | Anna | 16 | female | Moscow | 1 | Pizza Hut | 4.6 |
-| 1 | Anna | 16 | female | Moscow | 2 | Dominos | 4.3 |
-| ... | ... | ... | ... | ... | ... | ... | ... |
+| name | 
+| ------ | 
+| Elvira | 
+| ... |
+
 
 
 ## Chapter X
-## Exercise 06 — Lets see on “Hidden” Insights
+## Exercise 06 — favourite pizzas for Denis and Anna
 
 
-| Exercise 06: Lets see on “Hidden” Insights |                                                                                                                          |
+| Exercise 06: favourite pizzas for Denis and Anna |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex06                                                                                                                     |
-| Files to turn-in                      | `day01_ex06.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex06.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Let's go back to Exercise #03 and modify our SQL statement to return person names instead of person identifiers and change the order by action_date in ascending mode and then by person_name in descending mode. Take a look at the sample data below.
+Find all pizza names (and corresponding pizzeria names using the `menu` table) ordered by Denis or Anna. Sort a result by both columns. The sample output is shown below.
 
-| action_date | person_name |
+| pizza_name | pizzeria_name |
 | ------ | ------ |
-| 2022-01-01 | Irina |
-| 2022-01-01 | Anna |
-| 2022-01-01 | Andrey |
+| cheese pizza | Best Pizza |
+| cheese pizza | Pizza Hut |
 | ... | ... |
 
 ## Chapter XI
-## Exercise 07 — Just make a JOIN
+## Exercise 07 — Cheapest pizzeria for Dmitriy
 
 
-| Exercise 07: Just make a JOIN |                                                                                                                          |
+| Exercise 07: Cheapest pizzeria for Dmitriy |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex07                                                                                                                     |
-| Files to turn-in                      | `day01_ex07.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex07.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Write an SQL statement that returns the order date from the `person_order` table and the corresponding person name (name and age are formatted as in the data sample below) who made an order from the `person` table. Add a sort by both columns in ascending order.
-
-| order_date | person_information |
-| ------ | ------ |
-| 2022-01-01 | Andrey (age:21) |
-| 2022-01-01 | Andrey (age:21) |
-| 2022-01-01 | Anna (age:16) |
-| ... | ... |
-
+Please find the name of the pizzeria Dmitriy visited on January 8, 2022 and could eat pizza for less than 800 rubles.
 
 ## Chapter XII
-## Exercise 08 — Migrate JOIN to NATURAL JOIN
+## Exercise 08 — Continuing to research data
 
 
-| Exercise 08: Migrate JOIN to NATURAL JOIN |                                                                                                                          |
+| Exercise 08: Continuing to research data |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex08                                                                                                                     |
-| Files to turn-in                      | `day01_ex08.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex08.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
-| SQL Syntax Construction                        | `NATURAL JOIN`                                                                                              |
-| **Denied**                               |                                                                                                                          |
-| SQL Syntax Construction                        | other type of  `JOINs`                                                                                              |
+| Language                        | ANSI SQL                                                                                              |           
 
-Please rewrite a SQL statement from Exercise #07 by using NATURAL JOIN construction. The result must be the same like for Exercise #07.  
+
+Please find the names of all men from Moscow or Samara who order either pepperoni or mushroom pizza (or both). Please sort the result by person names in descending order. The sample output is shown below.
+
+| name | 
+| ------ | 
+| Dmitriy | 
+| ... |
+
 
 ## Chapter XIII
-## Exercise 09 — IN versus EXISTS
+## Exercise 09 — Who loves cheese and pepperoni?
 
 
-| Exercise 09: IN versus EXISTS |                                                                                                                          |
+| Exercise 09: Who loves cheese and pepperoni? |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex09                                                                                                                     |
-| Files to turn-in                      | `day01_ex09.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex09.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Write 2 SQL statements that return a list of pizzerias that have not been visited by people using IN for the first and EXISTS for the second.
+Find the names of all women who ordered both pepperoni and cheese pizzas (at any time and in any pizzerias). Make sure that the result is ordered by person's name. The sample data is shown below.
+
+| name | 
+| ------ | 
+| Anna | 
+| ... |
+
 
 ## Chapter XIV
-## Exercise 10 — Global JOIN
+## Exercise 10 — Find persons from one city
 
 
-| Exercise 10: Global JOIN |                                                                                                                          |
+| Exercise 10: Find persons from one city |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex10                                                                                                                     |
-| Files to turn-in                      | `day01_ex10.sql`                                                                                 |
+| Files to turn-in                      | `day02_ex10.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
 | Language                        | ANSI SQL                                                                                              |
 
-Please write an SQL statement that returns a list of the names of the people who ordered pizza from the corresponding pizzeria. 
-The sample result (with named columns) is provided below and yes ... please make the ordering by 3 columns (`person_name`, `pizza_name`, `pizzeria_name`) in ascending mode.
+Find the names of people who live at the same address. Make sure the result is sorted by 1st person's name, 2nd person's name, and shared address. The data sample is shown below. Make sure your column names match the column names below.
 
-| person_name | pizza_name | pizzeria_name | 
+| person_name1 | person_name2 | common_address | 
 | ------ | ------ | ------ |
-| Andrey | cheese pizza | Dominos |
-| Andrey | mushroom pizza | Dominos |
-| Anna | cheese pizza | Pizza Hut |
+| Andrey | Anna | Moscow |
+| Denis | Kate | Kazan |
+| Elvira | Denis | Kazan |
 | ... | ... | ... |
 
