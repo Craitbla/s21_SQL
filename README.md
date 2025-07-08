@@ -1,8 +1,8 @@
-# Day 07 — SQL Bootcamp
+# Day 08 — SQL Bootcamp
 
-## _Aggregated data is more informative, isn't it?_
+## _Isolation is one of ACID properties_
 
-Resume: Today you will see how to use specific OLAP constructions to get a "Value" from data.
+Resume: Today you will see how database works with transactions and isolation levels.
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
@@ -15,41 +15,56 @@ Resume: Today you will see how to use specific OLAP constructions to get a "Valu
 3. [Chapter III](#chapter-iii) \
     3.1. [Rules of the day](#rules-of-the-day)  
 4. [Chapter IV](#chapter-iv) \
-    4.1. [Exercise 00 — Simple aggregated information](#exercise-00-simple-aggregated-information)  
+    4.1. [Exercise 00 — Simple transaction](#exercise-00-simple-transaction)  
 5. [Chapter V](#chapter-v) \
-    5.1. [Exercise 01 — Let’s see real names](#exercise-01-lets-see-real-names)  
+    5.1. [Exercise 01 — Lost Update Anomaly](#exercise-01-lost-update-anomaly)  
 6. [Chapter VI](#chapter-vi) \
-    6.1. [Exercise 02 — Restaurants statistics](#exercise-02-restaurants-statistics)  
+    6.1. [Exercise 02 — Lost Update for Repeatable Read](#exercise-02-lost-update-for-repeatable-read)  
 7. [Chapter VII](#chapter-vii) \
-    7.1. [Exercise 03 — Restaurants statistics #2](#exercise-03-restaurants-statistics-2)  
+    7.1. [Exercise 03 — Non-Repeatable Reads Anomaly](#exercise-03-non-repeatable-reads-anomaly)  
 8. [Chapter VIII](#chapter-viii) \
-    8.1. [Exercise 04 — Clause for groups](#exercise-04-clause-for-groups)
+    8.1. [Exercise 04 — Non-Repeatable Reads for Serialization](#exercise-04-non-repeatable-reads-for-serialization)
 9. [Chapter IX](#chapter-ix) \
-    9.1. [Exercise 05 — Person's uniqueness](#exercise-05-persons-uniqueness)
+    9.1. [Exercise 05 — Phantom Reads Anomaly](#exercise-05-phantom-reads-anomaly)
 10. [Chapter X](#chapter-x) \
-    10.1. [Exercise 06 — Restaurant metrics](#exercise-06-restaurant-metrics)
+    10.1. [Exercise 06 — Phantom Reads for Repeatable Read](#exercise-06-phantom-reads-for-repeatable-read)
 11. [Chapter XI](#chapter-xi) \
-    11.1. [Exercise 07 — Average global rating](#exercise-07-average-global-rating)
-12. [Chapter XII](#chapter-xii) \
-    12.1. [Exercise 08 — Find pizzeria’s restaurant locations](#exercise-08-find-pizzerias-restaurant-locations)    
-13. [Chapter XIII](#chapter-xiii) \
-    13.1. [Exercise 09 — Explicit type transformation](#exercise-09-explicit-type-transformation)        
+    11.1. [Exercise 07 — Deadlock](#exercise-07-deadlock)
+      
 
 ## Chapter I
 ## Preamble
 
-![D07_01](misc/images/D07_01.png)
+![D08_01](misc/images/D08_01.png)
 
-For detailed data over time, see the Curve of Usefulness. In other words, detailed data (i.e. user transactions, facts about products and providers, etc.) is not useful to us from a historical perspective, because we only need to know some aggregation to describe what was going on a year ago.
+The Penrose stairs or Penrose steps, also called the impossible staircase, is an impossible object created by Lionel Penrose and his son Roger Penrose. A variation of the Penrose Triangle, it is a two-dimensional representation of a staircase in which the stairs make four 90-degree turns as they ascend or descend, yet form a continuous loop so that a person could climb them forever and never get higher. This is clearly impossible in three dimensions. The "continuous staircase" was first presented in an article written by the Penroses in 1959, based on the so-called "Penrose Triangle" published by Roger Penrose in the British Journal of Psychology in 1958. 
 
-Why is this happening? The reason lies in our analytical mind. Actually, we want to focus on our business strategy from a historical perspective to set new business goals, and we don't need the details. 
+"Penrose Stairs" is a mathematical anomaly, actually database theory has 4 foundametal data anomalies (physical anomalies).
+- Lost Update Anomaly;
+- Dirty Reads Anomaly;
+- Non-repeatable Reads Anomaly;
+- Phantom Read Anomaly.
 
-From a database point of view, "Analytical mind" corresponds to OLAP traffic (information layer), "details" corresponds to OLTP traffic (raw data layer). Today, there is a more flexible pattern for storing detailed data and aggregated information in the ecosystem. I am talking about `LakeHouse = DataLake + DataWareHouse`.
+Therefore, there are different isolation levels in ANSI SQL standard that prevent known anomalies.
 
-If we are talking about historical data, then we should mention the "Data Lifecycle Management" pattern. In simple words, what should we do with old data? TTL (time-to-live), SLA for data, Retention Data Policy, etc. are terms used in Data Governance strategy.
+![D08_02](misc/images/D08_02.png)
 
-![D07_02](misc/images/D07_02.png)
+From one point of view, this matrix should be a standard for any Relational Database, but reality... looks a bit different.
 
+|  |  | |
+| ------ | ------ | ------ |
+| PostgreSQL | ![D08_03](misc/images/D08_03.png) |
+| Oracle | ![D08_04](misc/images/D08_04.png) |
+| MySQL | ![D08_05](misc/images/D08_05.png) |
+
+Nowadays, IT community found a set of new anomalies based on Database Model (logical view):
+- Read Skew Anomaly;
+- Write Skew Anomaly;
+- Serialization Anomaly;
+- Fan Traps Anomaly;
+- Chasm Traps Anomaly;
+- Data Model Loops Anomaly;
+- etc.
 
 
 ## Chapter II
@@ -71,7 +86,7 @@ Absolutely anything can be represented in SQL! Let's get started and have fun!
 ## Rules of the day
 
 - Please make sure you have your own database and access to it on your PostgreSQL cluster. 
-- Please download a [script](materials/model.sql) with Database Model here and apply the script to your database (you can use command line with psql or just run it through any IDE, for example DataGrip from JetBrains or pgAdmin from PostgreSQL community). **Our knowledge way is incremental and linear therefore please be aware all changes that you made in Day03 during Exercises 07-13 and in Day04 during Exercise 07 should be on place (its similar like in real world , when we applied a release and need to be consistency with data for new changes).**
+- Please download a [script](materials/model.sql) with Database Model here and apply the script to your database (you can use command line with psql or just run it through any IDE, for example DataGrip from JetBrains or pgAdmin from PostgreSQL community). **Our knowledge way is incremental and linear therefore please be aware all changes that you made in Day03 during Exercises 07-13 and in Day04 during Exercise 07 should be on place (its similar like in real world, when we applied a release and need to be consistency with data for new changes).**
 - All tasks contain a list of Allowed and Denied sections with listed database options, database types, SQL constructions etc. Please have a look at the section before you start.
 - Please take a look at the Logical View of our Database Model. 
 
@@ -104,208 +119,211 @@ Absolutely anything can be represented in SQL! Let's get started and have fun!
 - field menu_id — foreign key to menu
 - field order_date — date (for example 2022-01-01) of person order 
 
-People's visit and people's order are different entities and don't contain any correlation between data. For example, a customer can be in a restaurant (just looking at the menu) and at the same time place an order in another restaurant by phone or mobile application. Or another case, just be at home and again make a call with order without any visits.
+People's visit and people's order are different entities and don't contain any correlation between data. For example, a customer can be in a restaurant (just looking at the menu) and in that time place an order in another restaurant by phone or mobile application. Or another case, just be at home and again make a call with order without any visits.
 
 
 ## Chapter IV
-## Exercise 00 — Simple aggregated information
+## Exercise 00 — Simple transaction
 
-| Exercise 00: Simple aggregated information |                                                                                                                          |
+| Exercise 00: Simple transaction |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex00                                                                                                                     |
-| Files to turn-in                      | `day07_ex00.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex00.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL|
+| Language                        |  SQL|
 
-Let's make a simple aggregation, please write a SQL statement that returns person identifiers and corresponding number of visits in any pizzerias and sorts by number of visits in descending mode and sorts by `person_id` in ascending mode. Please take a look at the sample of data below.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-| person_id | count_of_visits |
-| ------ | ------ |
-| 9 | 4 |
-| 4 | 3 |
-| ... | ... | 
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line). 
 
+Please provide a proof that your parallel session can’t see your changes until you will make a `COMMIT`;
+
+See the steps below.
+
+**Session #1**
+- Update of rating for "Pizza Hut" to 5 points in a transaction mode.
+- Check that you can see a changes in session #1.
+
+**Session #2**
+- Check that you can’t see a changes in session #2.
+
+**Session #1**
+- Publish your changes for all parallel sessions.
+
+**Session #2**
+- Check that you can see a changes in session #2.
+
+
+So, take a look on example of our output for Session #2.
+
+    pizza_db=> select * from pizzeria where name  = 'Pizza Hut';
+    id |   name    | rating
+    ----+-----------+--------
+    1 | Pizza Hut |    4.6
+    (1 row)
+
+    pizza_db=> select * from pizzeria where name  = 'Pizza Hut';
+    id |   name    | rating
+    ----+-----------+--------
+    1 | Pizza Hut |      5
+    (1 row)
+
+You can see that the same query returns different results because the first query was run before publishing in Session#1 and the second query was run after Session#1 was finished.
 
 ## Chapter V
-## Exercise 01 — Let’s see real names
+## Exercise 01 — Lost Update Anomaly
 
-| Exercise 01: Let’s see real names|                                                                                                                          |
+| Exercise 01: Lost Update Anomaly|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex01                                                                                                                     |
-| Files to turn-in                      | `day07_ex01.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex01.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        |  SQL                                                                                              |
 
-Please modify an SQL statement from Exercise 00 and return a person name (not an identifier). Additional clause is we need to see only top 4 people with maximum visits in each pizzerias and sorted by a person name. See the example of output data below.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-| name | count_of_visits |
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line). 
+
+Before running a task, make sure you are at a standard isolation level in your database. Just run the following statement `SHOW TRANSACTION ISOLATION LEVEL;` and the result should be "read committed".
+
+If not, please set the read committed isolation level explicitly on a session level.
+
+|  |  |
 | ------ | ------ |
-| Dmitriy | 4 |
-| Denis | 3 |
-| ... | ... | 
+| Let's examine one of the famous "Lost Update Anomaly" database patterns. You can see a graphical representation of this anomaly on a picture. The horizontal red line represents the final results after all the sequential steps for both Sessions. | ![D08_06](misc/images/D08_06.png) |
+
+Please check a rating for "Pizza Hut" in a transaction mode for both sessions and then make an `UPDATE` of the rating to a value of 4 in Session #1 and make an `UPDATE` of the rating to a value of 3.6 in Session #2 (in the same order as in the picture).
 
 
 
 ## Chapter VI
-## Exercise 02 — Restaurants statistics
+## Exercise 02 — Lost Update for Repeatable Read
 
-| Exercise 02: Restaurants statistics|                                                                                                                          |
+| Exercise 02: Lost Update for Repeatable Read|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex02                                                                                                                     |
-| Files to turn-in                      | `day07_ex02.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex02.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                  |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        |  SQL                                                                                              |
 
-Please write a SQL statement to see 3 favorite restaurants by visits and by orders in a list (please add an action_type column with values 'order' or 'visit', it depends on the data from the corresponding table). Please have a look at the example data below. The result should be sorted in ascending order by the action_type column and in descending order by the count column.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-| name | count | action_type |
-| ------ | ------ | ------ |
-| Dominos | 6 | order |
-| ... | ... | ... |
-| Dominos | 7 | visit |
-| ... | ... | ... |
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line).
+
+|  |  |
+| ------ | ------ |
+| Let's examine one of the famous "Lost Update Anomaly" database patterns, but under the `REPEATABLE READ` isolation level. You can see a graphical representation of this anomaly on a picture. Horizontal red line means the final results after all sequential steps for both Sessions. | ![D08_07](misc/images/D08_07.png) |
+
+Please check a rating for "Pizza Hut" in a transaction mode for both sessions and then make an `UPDATE` of the rating to a value of 4 in Session #1 and make an `UPDATE` of the rating to a value of 3.6 in Session #2 (in the same order as in the picture).
 
 ## Chapter VII
-## Exercise 03 — Restaurants statistics #2
+## Exercise 03 — Non-Repeatable Reads Anomaly
 
-| Exercise 03: Restaurants statistics #2 |                                                                                                                          |
+| Exercise 03: Non-Repeatable Reads Anomaly |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex03                                                                                                                     |
-| Files to turn-in                      | `day07_ex03.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex03.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        |  SQL                                                                                              |
 
-Write an SQL statement to see how restaurants are grouped by visits and by orders, and joined together by restaurant name.  
-You can use the internal SQL from Exercise 02 (Restaurants by Visits and by Orders) without any restrictions on the number of rows.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-In addition, add the following rules.
-- Compute a sum of orders and visits for the corresponding pizzeria (note that not all pizzeria keys are represented in both tables).
-- Sort the results by the `total_count` column in descending order and by the `name` column in ascending order.
-Take a look at the example data below.
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line).
 
-| name | total_count |
+|  |  |
 | ------ | ------ |
-| Dominos | 13 |
-| DinoPizza | 9 |
-| ... | ... | 
+| Let's check one of the famous "Non-Repeatable Reads" database patterns, but under the `READ COMMITTED` isolation level. You can see a graphical representation of this anomaly on a picture. The horizontal red line represents the final result after all sequential steps for both Sessions. | ![D08_08](misc/images/D08_08.png) |
+
+Please check a rating for "Pizza Hut" in a transaction mode for Session #1 and then make an `UPDATE` of the rating to a value of 3.6 in Session #2 (in the same order as in the picture).
 
 
 ## Chapter VIII
-## Exercise 04 — Clause for groups
+## Exercise 04 — Non-Repeatable Reads for Serialization
 
 
-| Exercise 04: Clause for groups |                                                                                                                          |
+| Exercise 04: Non-Repeatable Reads for Serialization |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex04                                                                                                                     |
-| Files to turn-in                      | `day07_ex04.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex04.sql` with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
-| **Denied**                               |                                                                                                                          |
-| Syntax construction                        | `WHERE`                                                                                              |
+| Language                        |  SQL                                                                                              |
 
-Please write a SQL statement that returns the person's name and the corresponding number of visits to any pizzerias if the person has visited more than 3 times (> 3). Please take a look at the sample data below.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-| name | count_of_visits |
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line).
+
+|  |  |
 | ------ | ------ |
-| Dmitriy | 4 |
+| Let's check one of the famous "Non-Repeatable Reads" database patterns, but under the `SERIALIZABLE` isolation level. You can see a graphical representation of this anomaly on a picture. The horizontal red line represents the final results after all sequential steps for both Sessions. | ![D08_09](misc/images/D08_09.png) |
+
+Please check a rating for "Pizza Hut" in a transaction mode for Session #1, and then make an `UPDATE` of the rating to a value of 3.0 in Session #2 (in the same order as in the picture).
 
 
 
 ## Chapter IX
-## Exercise 05 — Person's uniqueness
+## Exercise 05 — Phantom Reads Anomaly
 
 
-| Exercise 05: Person's uniqueness|                                                                                                                          |
+| Exercise 05: Phantom Reads Anomaly|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex05                                                                                                                     |
-| Files to turn-in                      | `day07_ex05.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex05.sql`  with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        |  ANSI SQL                                                                                              |
-| **Denied**                               |                                                                                                                          |
-| Syntax construction                        |  `GROUP BY`, any type (`UNION`,...) working with sets                                                                                              |
+| Language                        |   SQL                                                                                              |
 
-Please write a simple SQL query that returns a list of unique person names who have placed orders at any pizzerias. The result should be sorted by person name. Please see the example below.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-| name | 
-| ------ |
-| Andrey |
-| Anna | 
-| ... | 
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line).
+
+|  |  |
+| ------ | ------ |
+| Let's check one of the famous "phantom reads" database patterns, but under the `READ COMMITTED` isolation level. You can see a graphical representation of this anomaly on a picture. The horizontal red line represents the final results after all sequential steps for both Sessions. | ![D08_10](misc/images/D08_10.png) |
+
+Please summarize all ratings for all pizzerias in one transaction mode for Session #1 and then make `INSERT` of the new restaurant 'Kazan Pizza' with rating 5 and ID=10 in Session #2 (in the same order as in the picture).
+ 
 
 ## Chapter X
-## Exercise 06 — Restaurant metrics
+## Exercise 06 — Phantom Reads for Repeatable Read
 
 
-| Exercise 06: Restaurant metrics|                                                                                                                          |
+| Exercise 06: Phantom Reads for Repeatable Read|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex06                                                                                                                     |
-| Files to turn-in                      | `day07_ex06.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex06.sql`  with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        |  SQL                                                                                              |
 
-Please write a SQL statement that returns the number of orders, the average price, the maximum price and the minimum price for pizzas sold by each pizzeria restaurant. The result should be sorted by pizzeria name. See the sample data below. 
-Round the average price to 2 floating numbers.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
-| name | count_of_orders | average_price | max_price | min_price |
-| ------ | ------ | ------ | ------ | ------ |
-| Best Pizza | 5 | 780 | 850 | 700 |
-| DinoPizza | 5 | 880 | 1000 | 800 |
-| ... | ... | ... | ... | ... |
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line).
 
+|  |  |
+| ------ | ------ |
+| Let's check one of the famous "Phantom Reads" database patterns, but under the isolation level `REPEATABLE READ`. You can see a graphical representation of this anomaly on a picture. The horizontal red line represents the final results after all sequential steps for both Sessions. | ![D08_11](misc/images/D08_11.png) |
+
+Please summarize all ratings for all pizzerias in one transaction mode for Session #1 and then make `INSERT` of the new restaurant 'Kazan Pizza 2' with rating 4 and ID=11 in Session #2 (in the same order as in the picture).
 
 ## Chapter XI
-## Exercise 07 — Average global rating
+## Exercise 07 — Deadlock
 
 
-| Exercise 07: Average global rating|                                                                                                                          |
+| Exercise 07: Deadlock|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex07                                                                                                                     |
-| Files to turn-in                      | `day07_ex07.sql`                                                                                 |
+| Files to turn-in                      | `day08_ex07.sql`    with comments for Session #1, Session #2 statements; screenshot of psql output for Session #1; screenshot of psql output for Session #2                                                                                |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        |  SQL                                                                                              |
 
-Write an SQL statement that returns a common average rating (the output attribute name is global_rating) for all restaurants. Round your average rating to 4 floating point numbers.
+Please use the command line for PostgreSQL database (psql) for this task. You need to check how your changes will be published to the database for other database users. 
 
+Actually, we need two active sessions (i.e. 2 parallel sessions in the command line).
 
-## Chapter XII
-## Exercise 08 — Find pizzeria’s restaurant locations
-
-
-| Exercise 08: Find pizzeria’s restaurant locations|                                                                                                                          |
-|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| Turn-in directory                     | ex08                                                                                                                     |
-| Files to turn-in                      | `day07_ex08.sql`                                                                                 |
-| **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
-
-We know personal addresses from our data. Let's assume that this person only visits pizzerias in his city. Write a SQL statement that returns the address, the name of the pizzeria, and the amount of the person's orders. The result should be sorted by address and then by restaurant name. Please take a look at the sample output data below.
-
-| address | name |count_of_orders |
-| ------ | ------ |------ |
-| Kazan | Best Pizza |4 |
-| Kazan | DinoPizza |4 |
-| ... | ... | ... | 
+Let’s reproduce a deadlock situation in our database. 
 
 
-## Chapter XIII
-## Exercise 09 — Explicit type transformation
+|  |  |
+| ------ | ------ |
+| You can see a graphical representation of the deadlock situation in a picture. It looks like a "Christ-lock" between parallel sessions. | ![D08_12](misc/images/D08_12.png) |
 
-
-| Exercise 09: Explicit type transformation|                                                                                                                          |
-|---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| Turn-in directory                     | ex09                                                                                                                     |
-| Files to turn-in                      | `day07_ex09.sql`                                                                                 |
-| **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
-
-Please write a SQL statement that returns aggregated information by person's address, the result of "Maximum Age - (Minimum Age / Maximum Age)" presented as a formula column, next is average age per address and the result of comparison between formula and average columns (in other words, if formula is greater than average, then True, otherwise False value).
-
-The result should be sorted by address column. Please take a look at the example of output data below.
-
-| address | formula |average | comparison |
-| ------ | ------ |------ |------ |
-| Kazan | 44.71 |30.33 | true |
-| Moscow | 20.24 | 18.5 | true |
-| ... | ... | ... | ... |
-
+Please write any SQL statement with any isolation level (you can use the default setting) on the table `pizzeria` to reproduce this deadlock situation.
 
