@@ -1,8 +1,8 @@
-# Day 05 — SQL Bootcamp
+# Day 06 — SQL Bootcamp
 
-## _I improved my SQL Query! Please, provide proof!_
+## _Let's improve customer experience_
 
-Resume: Today you will see how and when to create database indexes
+Resume: Today you will see how to add a new business feature into our data model.
 
 💡 [Tap here](https://new.oprosso.net/p/4cb31ec3f47a4596bc758ea1861fb624) **to leave your feedback on the project**. It's anonymous and will help our team make your educational experience better. We recommend completing the survey immediately after the project.
 
@@ -15,35 +15,34 @@ Resume: Today you will see how and when to create database indexes
 3. [Chapter III](#chapter-iii) \
     3.1. [Rules of the day](#rules-of-the-day)  
 4. [Chapter IV](#chapter-iv) \
-    4.1. [Exercise 00 — Let’s create indexes for every foreign key](#exercise-00-lets-create-indexes-for-every-foreign-key)  
+    4.1. [Exercise 00 — Discounts, discounts , everyone loves discounts](#exercise-00-discounts-discounts-everyone-loves-discounts)  
 5. [Chapter V](#chapter-v) \
-    5.1. [Exercise 01 — How to see that index works?](#exercise-01-how-to-see-that-index-works)  
+    5.1. [Exercise 01 — Let’s set personal discounts](#exercise-01-lets-set-personal-discounts)  
 6. [Chapter VI](#chapter-vi) \
-    6.1. [Exercise 02 — Formula is in the index. Is it Ok?](#exercise-02-formula-is-in-the-index-is-it-ok)  
+    6.1. [Exercise 02 — Let’s recalculate a history of orders.](#exercise-02-lets-recalculate-a-history-of-orders)  
 7. [Chapter VII](#chapter-vii) \
-    7.1. [Exercise 03 — Multicolumn index for our goals](#exercise-03-multicolumn-index-for-our-goals)  
+    7.1. [Exercise 03 — Improvements are in a way](#exercise-03-improvements-are-in-a-way)  
 8. [Chapter VIII](#chapter-viii) \
-    8.1. [Exercise 04 — Uniqueness for data](#exercise-04-uniqueness-for-data)
+    8.1. [Exercise 04 — We need more Data Consistency](#exercise-04-we-need-more-data-consistency)
 9. [Chapter IX](#chapter-ix) \
-    9.1. [Exercise 05 — Partial uniqueness for data](#exercise-05-partial-uniqueness-for-data)
+    9.1. [Exercise 05 — Data Governance Rules](#exercise-05-data-governance-rules)
 10. [Chapter X](#chapter-x) \
-    10.1. [Exercise 06 — Let’s make performance improvement](#exercise-06-lets-make-performance-improvement)
+    10.1. [Exercise 06 — Let’s automate Primary Key generation](#exercise-06-lets-automate-primary-key-generation)
 
 ## Chapter I
 ## Preamble
 
-![D05_01](misc/images/D05_01.png)
+![D06_01](misc/images/D06_01.png)
 
-How does indexing speed us up? Why does the same SQL query with and without index have different TPS (Transaction Per Second)? Actually, from “user-point-of-view”, index is just a “black box” with magic inside. From “mathematical-point-of-view”, index is just an organized structure and no magic at all. 
+Why is a diamond one of the most durable objects? The reason lies in its structure. Each atom knows its place in the topology of the diamond and makes the whole diamond unbreakable. 
 
-Let me explain the reason why index exists but is not used.
+A logical structure is like a diamond. If you find a suitable structure for your own Database Model, you will find gold (or diamond :-). There are two aspects to Database Modeling. The first is a logical view, in other words, how your model will smoothly describe the real business world.
 
-|  |  |
-| ------ | ------ |
-|Please take a look at the image, the red line means linear time to find data based on a query. In other words, if you need to find something, then you have to look in each block, page, tuple and create a list of your search rows. (This term has a name "sequential scanning"). Actually, if you created a BTree index, then you got an improvement for speed. So the green line corresponds to logarithmic search time. Let's imagine, if you have 1000000 rows, and to do a search for 1 row, you need, say... 1 second, then in total you need 1000000 seconds, but with index you need ln(1000000) ~ 14 seconds. | ![D05_02](misc/images/D05_02.png) |
-| ![D05_03](misc/images/D05_03.png) | But why... does the index not work? There are several reasons to be honest, but the main one is based on the total number of rows of the indexed table. Please take a look at a picture, I have drawn a bold blue line and this is a path for search algorithms. As you can see, linear time at the beginning is most appropriate for algorithms instead of using logarithmic search. How do you find this intersection? Basically, I can recommend experiments, benchmarks, and ... your intuition. No formulas at all. Therefore, if you want to compare the results of your searches, you sometimes have to explicitly disable sequential scanning. For example, there is a special command set enable_seqscan =off in PostgreSQL. |
+![D06_02](misc/images/D06_02.png)
 
+On the other hand, your model should solve your functional tasks with minimal impact. This means transforming the logical model view into the physical model view, and not just from table and attribute descriptions. But actually, from performance and budget perspectives, which are more important today. How to find a balance? For this case, there are 3 steps to create a very good design. Just take a look at the image below.
 
+![D06_03](misc/images/D06_03.png)
 
 
 ## Chapter II
@@ -64,9 +63,9 @@ Absolutely anything can be represented in SQL! Let's get started and have fun!
 ## Chapter III
 ## Rules of the day
 
-- Please make sure you have your own database and access for it on your PostgreSQL cluster. 
-- Please download a [script](materials/model.sql) with Database Model here and apply the script to your database (you can use command line with psql or just run it through any IDE, for example DataGrip from JetBrains or pgAdmin from PostgreSQL community). **Our knowledge way is incremental and linear therefore please be aware all changes that you made in Day03 during exercises 07-13 should be on place (its similar like in real world , when we applied a release and need to be consistency with data for new changes).**
-- All tasks contain a list of Allowed and Denied sections with listed database options, database types, SQL constructions etc. Please have a look at the section before you start.
+- Please make sure you have your own database and access to it on your PostgreSQL cluster. 
+- Please download a [script](materials/model.sql) with Database Model here and apply the script to your database (you can use command line with psql or just run it through any IDE, for example DataGrip from JetBrains or pgAdmin from PostgreSQL community). **Our knowledge way is incremental and linear therefore please be aware that all changes you made in Day03 during Exercises 07-13 and in Day04 during Exercise 07 should be on place (its similar like in real world when we applied a release and need to be consistent with data for new changes).**
+- All tasks contain a list of Allowed and Denied sections with listed database options, database types, SQL constructions etc. Please review this section before starting.
 - Please take a look at the Logical View of our Database Model. 
 
 ![schema](misc/images/schema.png)
@@ -98,172 +97,143 @@ Absolutely anything can be represented in SQL! Let's get started and have fun!
 - field menu_id — foreign key to menu
 - field order_date — date (for example 2022-01-01) of person order 
 
-People's visit and people's order are different entities and don't contain any correlation between data. For example, a customer can be in a restaurant (just looking at the menu) and in that time place an order in another restaurant by phone or mobile application. Or another case, just be at home and again make a call with order without any visits.
+People's visit and people's order are different entities and don't contain any correlation between data. For example, a customer can be in a restaurant (just looking at the menu) and at the same time place an order in another restaurant by phone or mobile application. Or another case, just be at home and again make a call with order without any visits.
 
 ## Chapter IV
-## Exercise 00 — Let’s create indexes for every foreign key
+## Exercise 00 — Discounts, discounts , everyone loves discounts
 
-| Exercise 00: Let’s create indexes for every foreign key |                                                                                                                          |
+| Exercise 00: Discounts, discounts , everyone loves discounts |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex00                                                                                                                     |
-| Files to turn-in                      | `day05_ex00.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex00.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | SQL, DML, DDL                                                                                              |
 
-Please create a simple BTree index for each foreign key in our database. The name pattern should match the next rule "idx_{table_name}_{column_name}". For example, the name of the BTree index for the pizzeria_id column in the `menu` table is `idx_menu_pizzeria_id`.
+Let's add a new business feature to our data model.
+Every person wants to see a personal discount and every business wants to be closer for customers.
+
+Think about personal discounts for people from one side and pizza restaurants from the other. Need to create a new relational table (please set a name `person_discounts`) with the following rules.
+- Set id attribute like a Primary Key (please have a look at id column in existing tables and choose the same data type).
+- Set attributes person_id and pizzeria_id as foreign keys for corresponding tables (data types should be the same as for id columns in corresponding parent tables).
+- Please set explicit names for foreign key constraints using the pattern fk_{table_name}_{column_name}, for example `fk_person_discounts_person_id`.
+- Add a discount attribute to store a discount value in percent. Remember that the discount value can be a floating-point number (just use the `numeric` datatype). So please choose the appropriate datatype to cover this possibility.
+
 
 
 ## Chapter V
-## Exercise 01 — How to see that index works?
+## Exercise 01 — Let’s set personal discounts
 
-| Exercise 01: How to see that index works?|                                                                                                                          |
+| Exercise 01: Let’s set personal discounts|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex01                                                                                                                     |
-| Files to turn-in                      | `day05_ex01.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex01.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | SQL, DML, DDL                                                                                              |
 
-Before proceeding, please write an SQL statement that returns pizzas and the corresponding pizzeria names. See the example result below (no sorting required).
+Actually, we have created a structure to store our discounts and we are ready to go further and fill our `person_discounts` table with new records.
 
-| pizza_name | pizzeria_name | 
-| ------ | ------ |
-| cheese pizza | Pizza Hut |
-| ... | ... |
+So, there is a table `person_order` which stores the history of a person's orders. Please write a DML statement (`INSERT INTO ... SELECT ...`) that makes inserts new records into the `person_discounts` table based on the following rules.
+- Take aggregated state from person_id and pizzeria_id columns.
+- Calculate personal discount value by the next pseudo code:
 
-Let's prove that your indexes work for your SQL.
-The sample proof is the output of the `EXPLAIN ANALYZE` command. 
-Please take a look at the sample output of the command.
+    `if “amount of orders” = 1 then
+        “discount” = 10.5 
+    else if “amount of orders” = 2 then 
+        “discount” = 22
+    else 
+        “discount” = 30`
+
+- To create a primary key for the person_discounts table, use the following SQL construct (this construct is from the WINDOW FUNCTION SQL section).
     
-    ...
-    ->  Index Scan using idx_menu_pizzeria_id on menu m  (...)
-    ...
+    `... ROW_NUMBER( ) OVER ( ) AS id ...`
 
-**Hint**: Please think about why your indexes do not work in a direct way and what should we do to enable it?
 
 
 
 ## Chapter VI
-## Exercise 02 — Formula is in the index. Is it Ok?
+## Exercise 02 — Let’s recalculate a history of orders
 
-| Exercise 02: Formula is in the index. Is it Ok?|                                                                                                                          |
+| Exercise 02: Let’s recalculate a history of orders|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex02                                                                                                                     |
-| Files to turn-in                      | `day05_ex02.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex02.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | SQL, DML, DDL                                                                                              |
 
-Please create a functional B-Tree index  named `idx_person_name` on the column name of the `person` table. The index should contain person names in upper case. 
+Write a SQL statement that returns the orders with actual price and price with discount applied for each person in the corresponding pizzeria restaurant, sorted by person name and pizza name. Please see the sample data below.
 
-Write and provide any SQL with proof (`EXPLAIN ANALYZE`) that index idx_person_name works.
+| name | pizza_name | price | discount_price | pizzeria_name | 
+| ------ | ------ | ------ | ------ | ------ |
+| Andrey | cheese pizza | 800 | 624 | Dominos |
+| Andrey | mushroom pizza | 1100 | 858 | Dominos |
+| ... | ... | ... | ... | ... |
 
 ## Chapter VII
-## Exercise 03 — Multicolumn index for our goals
+## Exercise 03 — Improvements are in a way
 
-| Exercise 03: Multicolumn index for our goals |                                                                                                                          |
+| Exercise 03: Improvements are in a way |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex03                                                                                                                     |
-| Files to turn-in                      | `day05_ex03.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex03.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | SQL, DML, DDL                                                                                              |
 
 
-Please create a better multi-column B-Tree index named `idx_person_order_multi` for the SQL statement below.
+Actually, we need to improve data consistency from one side and performance tuning from the other side. Please create a multi-column unique index (named `idx_person_discounts_unique`) that prevents duplicates of the person and pizzeria identifier pairs.
 
-    SELECT person_id, menu_id,order_date
-    FROM person_order
-    WHERE person_id = 8 AND menu_id = 19;
+After creating a new index, please provide any simple SQL statement that shows proof of the index usage (using `EXPLAIN ANALYZE`).
+The proof example is below:
+    
+    ...
+    Index Scan using idx_person_discounts_unique on person_discounts
+    ...
 
-
-The `EXPLAIN ANALYZE` command should return the next pattern. Please pay attention to "Index Only Scan" scanning!
-
-    Index Only Scan using idx_person_order_multi on person_order ...
-
-Provide any SQL with proof (`EXPLAIN ANALYZE`) that index `idx_person_order_multi` works. 
 
 ## Chapter VIII
-## Exercise 04 — Uniqueness for data
+## Exercise 04 — We need more Data Consistency
 
 
-| Exercise 04: Uniqueness for data |                                                                                                                          |
+| Exercise 04: We need more Data Consistency |                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex04                                                                                                                     |
-| Files to turn-in                      | `day05_ex04.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex04.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | SQL, DML, DDL                                                                                              |
 
-Please create a unique BTree index named `idx_menu_unique` on the `menu` table for  `pizzeria_id` and `pizza_name` columns. Write and provide any SQL with proof (`EXPLAIN ANALYZE`) that index `idx_menu_unique` works. 
+Please add the following constraint rules for existing columns of the `person_discounts` table.
+- person_id column should not be NULL (use constraint name `ch_nn_person_id`);
+- pizzeria_id column should not be NULL (use constraint name `ch_nn_pizzeria_id`);
+- discount column should not be NULL (use constraint name `ch_nn_discount`);
+- discount column should be 0 percent by default;
+- discount column should be in a range values from 0 to 100 (use constraint name `ch_range_discount`).
 
 
 ## Chapter IX
-## Exercise 05 — Partial uniqueness for data
+## Exercise 05 — Data Governance Rules
 
 
-| Exercise 05: Partial uniqueness for data |                                                                                                                          |
+| Exercise 05: Data Governance Rules|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex05                                                                                                                     |
-| Files to turn-in                      | `day05_ex05.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex05.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        |  SQL, DML, DDL                                                                                              |
 
-Please create a partially unique BTree index named `idx_person_order_order_date` on the `person_order` table for the `person_id` and `menu_id` attributes with partial uniqueness for the `order_date` column for the date '2022-01-01'.
-
-The `EXPLAIN ANALYZE` command should return the next pattern.
-
-    Index Only Scan using idx_person_order_order_date on person_order …
+To comply with Data Governance Policies, you need to add comments for the table and the table's columns. Let's apply this policy to the `person_discounts` table. Please add English or Russian comments (it is up to you) explaining what is a business goal of a table and all its attributes.
 
 ## Chapter X
-## Exercise 06 — Let’s make performance improvement
+## Exercise 06 — Let’s automate Primary Key generation
 
 
-| Exercise 06: Let’s make performance improvement|                                                                                                                          |
+| Exercise 06: Let’s automate Primary Key generation|                                                                                                                          |
 |---------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Turn-in directory                     | ex06                                                                                                                     |
-| Files to turn-in                      | `day05_ex06.sql`                                                                                 |
+| Files to turn-in                      | `day06_ex06.sql`                                                                                 |
 | **Allowed**                               |                                                                                                                          |
-| Language                        | ANSI SQL                                                                                              |
+| Language                        | SQL, DML, DDL                                                                                              |
+| **Denied**                               |                                                                                                                          |
+| SQL Syntax Pattern                        | Don’t use hard-coded value for amount of rows to set a right value for sequence                                                                                              |
 
-Take a look at the SQL below from a technical perspective (ignore a logical case of this SQL statement).
-
-    SELECT
-        m.pizza_name AS pizza_name,
-        max(rating) OVER (PARTITION BY rating ORDER BY rating ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS k
-    FROM  menu m
-    INNER JOIN pizzeria pz ON m.pizzeria_id = pz.id
-    ORDER BY 1,2;
-
-Create a new BTree index named `idx_1` that should improve the "Execution Time" metric of this SQL. Provide evidence (`EXPLAIN ANALYZE`) that the SQL has been improved.
-
-**Hint**: This exercise looks like a "brute force" task to find a good cover index, so before your new test, remove the `idx_1` index.
-
-Sample of my improvement:
-
-**Before**:
-
-    Sort  (cost=26.08..26.13 rows=19 width=53) (actual time=0.247..0.254 rows=19 loops=1)
-    "  Sort Key: m.pizza_name, (max(pz.rating) OVER (?))"
-    Sort Method: quicksort  Memory: 26kB
-    ->  WindowAgg  (cost=25.30..25.68 rows=19 width=53) (actual time=0.110..0.182 rows=19 loops=1)
-            ->  Sort  (cost=25.30..25.35 rows=19 width=21) (actual time=0.088..0.096 rows=19 loops=1)
-                Sort Key: pz.rating
-                Sort Method: quicksort  Memory: 26kB
-                ->  Merge Join  (cost=0.27..24.90 rows=19 width=21) (actual time=0.026..0.060 rows=19 loops=1)
-                        Merge Cond: (m.pizzeria_id = pz.id)
-                        ->  Index Only Scan using idx_menu_unique on menu m  (cost=0.14..12.42 rows=19 width=22) (actual time=0.013..0.029 rows=19 loops=1)
-                            Heap Fetches: 19
-                        ->  Index Scan using pizzeria_pkey on pizzeria pz  (cost=0.13..12.22 rows=6 width=15) (actual time=0.005..0.008 rows=6 loops=1)
-    Planning Time: 0.711 ms
-    Execution Time: 0.338 ms
-
-**After**:
-
-    Sort  (cost=26.28..26.33 rows=19 width=53) (actual time=0.144..0.148 rows=19 loops=1)
-    "  Sort Key: m.pizza_name, (max(pz.rating) OVER (?))"
-    Sort Method: quicksort  Memory: 26kB
-    ->  WindowAgg  (cost=0.27..25.88 rows=19 width=53) (actual time=0.049..0.107 rows=19 loops=1)
-            ->  Nested Loop  (cost=0.27..25.54 rows=19 width=21) (actual time=0.022..0.058 rows=19 loops=1)
-                ->  Index Scan using idx_1 on …
-                ->  Index Only Scan using idx_menu_unique on menu m  (cost=0.14..2.19 rows=3 width=22) (actual time=0.004..0.005 rows=3 loops=6)
-    …
-    Planning Time: 0.338 ms
-    Execution Time: 0.203 ms
+Let’s create a Database Sequence named `seq_person_discounts` (starting with a value of 1) and set a default value for the id attribute of the `person_discounts` table to automatically take a value from `seq_person_discounts` each time. 
+Please note that your next sequence number is 1, in this case please set an actual value for database sequence based on formula "number of rows in person_discounts table" + 1. Otherwise you will get errors about Primary Key violation constraint.
 
