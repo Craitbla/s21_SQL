@@ -251,4 +251,9 @@ See a sample of the output below. Sort the result by User Name in descending ord
 | Иван | Иванов | EUR | 17 |
 | ... | ... | ... | ... |
 
+## Авторы проекта:
+  * Aglet Craitbla ([GitHub](https://github.com/Craitbla))
+  * Anna BalagurovaA ([GitHub](https://github.com/BalagurovaA))
+  * Амир Габитов ([GitHub](https://github.com/keyluxy))
+
 
